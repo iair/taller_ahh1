@@ -127,7 +127,7 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
-# Environments
+# Ignore virtual environments
 .env
 .venv
 env/
@@ -135,6 +135,10 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Ignore configuration secrets
+.env.local
+.env.test
 
 # Spyder project settings
 .spyderproject
@@ -169,3 +173,25 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Ignore data folders
+data/
+dataset/
+dstore/
+
+
+# Ignore temporary files and directories
+*.tmp
+*.log
+*.bak
+*.swp
+*.swo
+
+# Ignore operating system files
+.DS_Store
+Thumbs.db
+
+# Ignore output directories
+output/
+build/
+dist/
