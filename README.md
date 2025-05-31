@@ -1,6 +1,3 @@
-Aquí tienes un `README.md` diseñado para tu proyecto `TALLER_AHH1`, orientado a análisis de encuestas con codificación, validación y exploración:
-
-```markdown
 # TALLER_AHH1
 
 Este proyecto tiene como objetivo el procesamiento, codificación y análisis exploratorio de una encuesta aplicada a estudiantes, con foco en su relación con la intención de cambiarse o retirarse de su carrera.
@@ -94,5 +91,3 @@ Incluye tests para funciones como:
 ## ✍️ Autor
 
 Desarrollado por Iair Linker para el análisis de hábitos y motivaciones estudiantiles.
-
-```
