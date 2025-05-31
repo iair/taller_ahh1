@@ -1,5 +1,33 @@
+import pytest
+import tempfile
+import yaml
 import pandas as pd
-from taller_utils.encoding import process_survey_data
+from taller_utils.encoding import process_survey_data, load_yaml_encodings
+
+def test_load_yaml_encodings():
+    # Simular un archivo YAML temporal
+    dummy_yaml_content = [
+        {
+            "question": "¿Te gusta programar?",
+            "type": "binary",
+            "encoding": {
+                "Sí": 1,
+                "No": 0
+            }
+        }
+    ]
+
+    with tempfile.NamedTemporaryFile(mode="w+", suffix=".yaml", delete=False) as tmp:
+        yaml.dump(dummy_yaml_content, tmp, allow_unicode=True)
+        tmp_path = tmp.name
+
+    result = load_yaml_encodings(tmp_path)
+
+    assert isinstance(result, dict), "La salida debe ser un diccionario"
+    assert "survey_responses" in result, "Debe contener la clave 'survey_responses'"
+    assert isinstance(result["survey_responses"], list), "La clave 'survey_responses' debe contener una lista"
+    assert isinstance(result["survey_responses"][0], dict), "Cada item en la lista debe ser un diccionario"
+    assert result["survey_responses"][0]["question"] == "¿Te gusta programar?"
 
 def test_simple_binary_encoding():
     """

@@ -2,6 +2,20 @@ import pandas as pd
 import numpy as np
 import yaml
 import json
+
+def load_yaml_encodings(yaml_file_path: str) -> dict:
+    """
+    Carga un archivo YAML con codificaciones de preguntas.
+
+    Parámetros:
+    - yaml_file_path: Ruta al archivo YAML
+
+    Retorna:
+    - Un diccionario con la clave 'survey_responses' conteniendo la lista de preguntas y sus codificaciones
+    """
+    with open(yaml_file_path, 'r', encoding='utf-8') as file:
+        yaml_data = yaml.safe_load(file)
+    return {'survey_responses': yaml_data}
 def process_survey_data(
     df: pd.DataFrame, 
     encoding_dict: dict, 
