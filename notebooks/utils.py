@@ -143,6 +143,7 @@ def process_survey_data(
         one_hot_encoders = {}
     
     df = df.copy()
+    unmapped_values = {}  # Guarda respuestas no encontradas por pregunta
     
     for question in encoding_dict['survey_responses']:
         question_text = question['question']
@@ -154,27 +155,42 @@ def process_survey_data(
             continue
 
         if encoding_type in ('binary', 'ordinal'):
-            # Handle missing or invalid values
-            df[question_text] = df[question_text].apply(
-                lambda x: encoding.get(str(x).strip(), pd.NA) if pd.notna(x) else pd.NA
-            )
+            unmapped_values[question_text] = []
+
+            def map_and_warn(x):
+                val = str(x).strip() if pd.notna(x) else None
+                if val is None:
+                    return pd.NA
+                if val not in encoding:
+                    print(f"⚠️  Valor no mapeado en '{question_text}': '{val}'")
+                    unmapped_values[question_text].append(val)
+                    return pd.NA
+                return encoding[val]
+
+            df[question_text] = df[question_text].apply(map_and_warn)
 
         elif encoding_type == 'categorical':
             if ohe_categorical:
                 try:
-                    # Split multiple responses and create dummy columns
+                    # Split multiple responses
                     responses = df[question_text].str.split(', ').explode().str.strip()
+                    # Convert to categorical with all expected categories (even if missing in data)
+                    responses = pd.Categorical(responses, categories=encoding.keys())
+                    # Create dummy variables including all expected categories
                     dummies = pd.get_dummies(responses, prefix=question_text)
-                    
                     # Aggregate dummy columns back to original index
                     encoded = dummies.groupby(level=0).max()
-                    
+                    # Fill missing columns (those not present in data but in encoding)
+                    expected_cols = [f"{question_text}_{cat}" for cat in encoding.keys()]
+                    for col in expected_cols:
+                        if col not in encoded.columns:
+                            encoded[col] = 0
+                    encoded = encoded[expected_cols]  # Ensure column order
                     # Store encoder information
                     one_hot_encoders[question_text] = {
                         'categories': list(encoding.keys()),
                         'encoded_columns': encoded.columns
                     }
-                    
                     # Update DataFrame
                     df = df.drop(columns=[question_text]).join(encoded)
                 except Exception as e:
@@ -182,11 +198,26 @@ def process_survey_data(
                     continue
             else:
                 # Handle multiple responses for categorical variables
-                df[question_text] = df[question_text].apply(
-                    lambda x: ', '.join([encoding.get(val.strip(), '') 
-                                       for val in str(x).split(', ')
-                                       if val.strip() in encoding])
-                    if pd.notna(x) else pd.NA
-                )
+                for category_key, category_code in encoding.items():
+                    col_name = f"{question_text}__{category_code}"
+                    df[col_name] = df[question_text].apply(
+                        lambda x: category_key in str(x).split(', ') if pd.notna(x) else False
+                    ).astype(int)
+                df.drop(columns=[question_text], inplace=True)
+        
+    # Mostrar resumen de valores no mapeados
+    for question, values in unmapped_values.items():
+        unique_unmapped = set(values)
+        if unique_unmapped:
+            print(f"\nResumen no mapeado en: {question}")
+            print(f"Valores únicos no mapeados ({len(unique_unmapped)}): {unique_unmapped}")
+
+    # Guardar a archivo JSON si hubo errores
+    if any(unmapped_values.values()):
+        import json
+        with open("unmapped_values.json", "w", encoding="utf-8") as f:
+            json.dump(unmapped_values, f, ensure_ascii=False, indent=2)
+        print("\n🔍 Detalles guardados en: unmapped_values.json")
+
 
     return df

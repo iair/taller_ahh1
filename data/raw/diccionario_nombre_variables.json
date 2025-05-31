@@ -2,7 +2,7 @@
     "P0": {
         "pregunta": "Marca temporal",
         "tipo de dato": "Fecha",
-        "categoría": ""
+        "categoría": "tiempo"
     },
     "P1": {
         "pregunta": "Dirección de correo electrónico",
