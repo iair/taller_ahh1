@@ -1,4 +1,5 @@
 from datetime import datetime
+import pandas as pd
 def calculate_age(birth_date_str: str):
     """
     Calcula la edad de una persona a partir de su fecha de nacimiento en formato 'dd/mm/yyyy'.
@@ -26,3 +27,24 @@ def calculate_age(birth_date_str: str):
         return age
     except:
         return None
+def resumen_na(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Genera un resumen con la cantidad y porcentaje de valores nulos por columna.
+
+    Parámetros:
+    - df (pd.DataFrame): DataFrame sobre el cual calcular los valores nulos.
+
+    Retorna:
+    - pd.DataFrame con columnas:
+        - 'nulos': cantidad de valores faltantes
+        - 'porcentaje': porcentaje respecto al total de filas
+    """
+    na_counts = df.isna().sum()
+    na_percent = df.isna().mean() * 100
+
+    resumen = pd.DataFrame({
+        'nulos': na_counts,
+        'porcentaje': na_percent.round(2)
+    }).sort_values(by='nulos', ascending=False)
+
+    return resumen

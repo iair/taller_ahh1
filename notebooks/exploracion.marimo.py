@@ -8,13 +8,38 @@ app = marimo.App(width="medium")
 def _():
     import pandas as pd
     from taller_utils.analysis import explorar_relacion_con_target
-    return explorar_relacion_con_target, pd
+    from taller_utils.helpers import resumen_na
+    return explorar_relacion_con_target, pd, resumen_na
+
+
+@app.cell
+def _(pd):
+    def _():
+        df = pd.read_csv("data/raw/encuesta.csv")
+        return df.head()
+
+
+    _()
+    return
+
+
+@app.cell
+def _(df, resumen_na):
+    resumen_na(df)
+    return
 
 
 @app.cell
 def _(pd):
     df = pd.read_csv("data/processed/encuesta_codificada.csv")
+    df.head()
     return (df,)
+
+
+@app.cell
+def _(df, resumen_na):
+    resumen_na(df)
+    return
 
 
 @app.cell
