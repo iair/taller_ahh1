@@ -58,6 +58,8 @@ Esto:
 
 ## 🔬 Exploración con Marimo
 
+Si solo quieres ver los resultados sin ejecutar, te recomendamos ir a la carpeta ***reports*** , descargar el html, hacer click en el archivo descargado en tu local y se ejecutará en tu navegador. 
+
 El análisis exploratorio se realiza mediante `notebooks/exploracion.marimo.py`.
 
 Para ejecutarlo:
@@ -68,9 +70,16 @@ marimo run notebooks/exploracion.marimo.py
 
 Incluye:
 
-* Comparaciones por pregunta respecto al target
-* Test estadísticos (Mann–Whitney, Chi²)
-* Visualizaciones automáticas
+    - Visualizaciones específicas:
+        - Gráficos de barras apiladas para ordinales discretas o categóricas.
+        - Boxplots para variables numéricas u ordinales continuas.
+        - Barras horizontales para preguntas tipo multiselect codificadas como múltiples columnas dummy.
+
+    - Pruebas estadísticas:
+        - Mann–Whitney U test: para variables ordinales o numéricas.
+        - Chi² test: para variables categóricas.
+        - Fisher's exact test: si es tabla 2x2 y contiene frecuencias esperadas < 5.
+        - G-test (log-likelihood): para tablas mayores a 2x2 con celdas esperadas < 5.
 
 ---
 
